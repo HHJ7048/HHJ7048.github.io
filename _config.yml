@@ -16,7 +16,7 @@ timezone: Asia/Seoul
 
 title: HHJ7048 # the main title
 
-tagline: 역전파 기록 # it will display as the subtitle
+tagline: 깃허브 블로그 # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
   A minimal, responsive and feature-rich Jekyll theme for technical writing.
