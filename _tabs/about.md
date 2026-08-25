@@ -21,8 +21,8 @@ order: 4
 <style>
   .visitor-counter {
     width: 100%;
-    max-width: 420px;
-    margin: 1.5rem auto;
+    max-width: 600px;
+    margin: 2rem auto;
     border-collapse: collapse;
     table-layout: fixed;
   }
@@ -30,16 +30,16 @@ order: 4
   .visitor-counter td {
     width: 50%;
     border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
-    padding: 0.6rem 0.4rem;
+    padding: 1.1rem 0.6rem;
     text-align: center;
   }
   .visitor-counter thead th {
-    font-size: clamp(0.75rem, 3vw, 0.95rem);
+    font-size: clamp(0.95rem, 3.5vw, 1.2rem);
     font-weight: 600;
     opacity: 0.65;
   }
   .visitor-counter tbody td {
-    font-size: clamp(1.25rem, 6vw, 1.9rem);
+    font-size: clamp(1.6rem, 8vw, 2.6rem);
     font-weight: 700;
     line-height: 1.3;
   }
