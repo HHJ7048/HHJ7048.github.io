@@ -5,52 +5,53 @@
   var totalEl = document.getElementById('vc-total');
   if (!todayEl || !totalEl) return;
 
-  // KST 기준 오늘 날짜 (같은 브라우저에서 하루 한 번만 카운트)
+  var BASE = 'https://abacus.jasoncameron.dev';
+  var NS = 'hhj7048-github-io';
+
+  // KST 기준 오늘 날짜 (일별 카운터 키로도 쓰고, 하루 1회 증가 가드로도 씀)
   var todayStr = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });
-  var cacheKey = 'hhj7048_visitor_cache';
+  var todayKey = 'visits-' + todayStr;
+  var totalKey = 'total-visits';
+  var flagKey = 'hhj7048_visited_' + todayStr;
+
+  // 테스트용: 주소 끝에 ?reset-visitor 를 붙이면 오늘 카운트했다는 표시를 지우고 다시 증가시킴
+  if (location.search.indexOf('reset-visitor') !== -1) {
+    try { localStorage.removeItem(flagKey); } catch (e) {}
+  }
 
   function render(today, total) {
     todayEl.textContent = Number(today).toLocaleString();
     totalEl.textContent = Number(total).toLocaleString();
   }
 
-  // 테스트용: 주소 끝에 ?reset-visitor 를 붙이면 캐시를 지우고 강제로 다시 카운트
-  if (location.search.indexOf('reset-visitor') !== -1) {
-    try { localStorage.removeItem(cacheKey); } catch (e) {}
+  function call(action, key) {
+    return fetch(BASE + '/' + action + '/' + NS + '/' + key)
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function (data) { return data.value; });
   }
 
-  var cached = null;
+  var alreadyCountedToday = false;
   try {
-    cached = JSON.parse(localStorage.getItem(cacheKey));
+    alreadyCountedToday = localStorage.getItem(flagKey) === '1';
   } catch (e) {}
 
-  // 오늘 이미 카운트했다면 서버에 다시 요청하지 않고 캐시된 값만 표시
-  if (cached && cached.date === todayStr) {
-    render(cached.today, cached.total);
-    return;
+  var work;
+  if (alreadyCountedToday) {
+    // 오늘 이미 카운트했다면 증가 없이 최신값만 조회 (몇 번을 새로고침해도 안전)
+    work = Promise.all([call('get', todayKey), call('get', totalKey)]);
+  } else {
+    // 이 브라우저로 오늘 처음 방문했을 때만 딱 한 번 증가
+    work = Promise.all([call('hit', todayKey), call('hit', totalKey)]).then(function (vals) {
+      try { localStorage.setItem(flagKey, '1'); } catch (e) {}
+      return vals;
+    });
   }
 
-  var target = encodeURIComponent('{{ site.url }}');
-  var url = 'https://hitscounter.dev/api/hit?url=' + target + '&label=visit&icon=eye-fill&color=%23198754';
-
-  fetch(url)
-    .then(function (res) {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.text();
-    })
-    .then(function (svg) {
-      var m = svg.match(/(\d[\d,]*)\s*\/\s*(\d[\d,]*)/);
-      if (!m) {
-        console.warn('[visitor-counter] unexpected response:', svg.slice(0, 300));
-        throw new Error('parse failed');
-      }
-      var today = m[1].replace(/,/g, '');
-      var total = m[2].replace(/,/g, '');
-      try {
-        localStorage.setItem(cacheKey, JSON.stringify({ date: todayStr, today: today, total: total }));
-      } catch (e) {}
-      render(today, total);
-    })
+  work
+    .then(function (vals) { render(vals[0], vals[1]); })
     .catch(function (err) {
       console.error('[visitor-counter]', err);
       todayEl.textContent = '-';
