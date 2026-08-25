@@ -14,6 +14,11 @@
     totalEl.textContent = Number(total).toLocaleString();
   }
 
+  // 테스트용: 주소 끝에 ?reset-visitor 를 붙이면 캐시를 지우고 강제로 다시 카운트
+  if (location.search.indexOf('reset-visitor') !== -1) {
+    try { localStorage.removeItem(cacheKey); } catch (e) {}
+  }
+
   var cached = null;
   try {
     cached = JSON.parse(localStorage.getItem(cacheKey));
