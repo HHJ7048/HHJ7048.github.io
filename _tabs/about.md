@@ -7,4 +7,60 @@ order: 4
 > LLM, 보안, 논문 리뷰 등등
 {: .prompt-tip }
 
-![조회수](https://hitscounter.dev/api/hit?url={{ site.url | url_encode }}&label=%EC%A1%B0%ED%9A%8C%EC%88%98&icon=eye-fill&color=%23198754)
+<div id="visitor-counter" class="d-flex justify-content-center gap-5 text-center my-4">
+  <div>
+    <div class="text-muted small mb-1">오늘</div>
+    <div id="vc-today" class="fw-bold" style="font-size: 1.75rem; line-height: 1;">-</div>
+  </div>
+  <div>
+    <div class="text-muted small mb-1">전체</div>
+    <div id="vc-total" class="fw-bold" style="font-size: 1.75rem; line-height: 1;">-</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var todayEl = document.getElementById('vc-today');
+  var totalEl = document.getElementById('vc-total');
+  if (!todayEl || !totalEl) return;
+
+  // KST 기준 오늘 날짜 (같은 브라우저에서 하루 한 번만 카운트)
+  var todayStr = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });
+  var cacheKey = 'hhj7048_visitor_cache';
+
+  function render(today, total) {
+    todayEl.textContent = Number(today).toLocaleString();
+    totalEl.textContent = Number(total).toLocaleString();
+  }
+
+  var cached = null;
+  try {
+    cached = JSON.parse(localStorage.getItem(cacheKey));
+  } catch (e) {}
+
+  // 오늘 이미 카운트했다면 서버에 다시 요청하지 않고 캐시된 값만 표시
+  if (cached && cached.date === todayStr) {
+    render(cached.today, cached.total);
+    return;
+  }
+
+  var url = 'https://hitscounter.dev/api/hit?url={{ site.url | url_encode }}&label=visit&icon=eye-fill&color=%23198754';
+
+  fetch(url)
+    .then(function (res) { return res.text(); })
+    .then(function (svg) {
+      var m = svg.match(/aria-label="[^:]*:\s*(\d+)\s*\/\s*(\d+)"/);
+      if (!m) throw new Error('parse failed');
+      var today = m[1];
+      var total = m[2];
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify({ date: todayStr, today: today, total: total }));
+      } catch (e) {}
+      render(today, total);
+    })
+    .catch(function () {
+      todayEl.textContent = '-';
+      totalEl.textContent = '-';
+    });
+})();
+</script>
