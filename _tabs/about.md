@@ -20,34 +20,45 @@ order: 4
 
 <style>
   .visitor-counter {
-    display: flex;
-    justify-content: center;
-    gap: 15rem;
+    width: 100%;
+    max-width: 420px;
+    margin: 1.5rem auto;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .visitor-counter th,
+  .visitor-counter td {
+    width: 50%;
+    border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+    padding: 0.6rem 0.4rem;
     text-align: center;
-    margin: 1.5rem 0;
   }
-  .visitor-counter .vc-label {
-    font-size: 2.0rem;
-    opacity: 0.6;
-    margin-bottom: 0.25rem;
+  .visitor-counter thead th {
+    font-size: clamp(0.75rem, 3vw, 0.95rem);
+    font-weight: 600;
+    opacity: 0.65;
   }
-  .visitor-counter .vc-value {
-    font-size: 1.75rem;
+  .visitor-counter tbody td {
+    font-size: clamp(1.25rem, 6vw, 1.9rem);
     font-weight: 700;
-    line-height: 1;
+    line-height: 1.3;
   }
 </style>
 
-<div id="visitor-counter" class="visitor-counter">
-  <div>
-    <div class="vc-label">오늘 조회수</div>
-    <div id="vc-today" class="vc-value">-</div>
-  </div>
-  <div>
-    <div class="vc-label">전체 조회수</div>
-    <div id="vc-total" class="vc-value">-</div>
-  </div>
-</div>
+<table id="visitor-counter" class="visitor-counter">
+  <thead>
+    <tr>
+      <th>오늘 조회수</th>
+      <th>전체 조회수</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td id="vc-today">-</td>
+      <td id="vc-total">-</td>
+    </tr>
+  </tbody>
+</table>
 
 <script src="{{ '/assets/js/visitor-counter.js' | relative_url }}" defer></script>
 <hr>
