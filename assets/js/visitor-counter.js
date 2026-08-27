@@ -1,5 +1,3 @@
----
----
 (function () {
   var todayEl = document.getElementById('vc-today');
   var totalEl = document.getElementById('vc-total');
