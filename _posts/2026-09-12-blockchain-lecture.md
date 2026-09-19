@@ -1,7 +1,7 @@
 ---
 title: 2026 Block Chain Meetup Day
 date: 2026-09-12 21:00:00 +0900
-categories: [기타]
+categories: [Security, 기타]
 tags: [블록체인]
 ---
 
